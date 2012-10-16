@@ -77,7 +77,9 @@ class grid {
             <table class="<?=$this->table_class?>">
                 <tr>
 <?
+//print_pre($this);
                 foreach ( $this->columns as $column ) {
+
                     if ( !$column['th_class'] ) $column['th_class'] = $column['class'];
                     if ( !$column['th_style'] ) $column['th_style'] = $column['style'];
                     $th_attr = '';
@@ -120,7 +122,26 @@ class grid {
                         $this->get_incpath();
                         include( $this->incpath . '/' . $column['td'] );
                     } else if ( array_key_exists($column['td'],$r) ) {
-                        echo $r[ $column['td'] ];
+                        if (($_GET['address'] == 'true') && ($column['td'] == 'bill_address1')) {
+                            $r[ $column['td'] ] = $r['bill_address1'] . "<br />";
+                            if ($r['bill_address2']) {
+                                $r[ $column['td'] ] .= $r['bill_address2'] . "<br />";
+                            }
+                            $r[ $column['td'] ] .= $r['bill_city'] . "<br />";
+                            $r[ $column['td'] ] .= $r['bill_state'] . "<br />";
+                            $r[ $column['td'] ] .= $r['bill_zip'];
+                            $doc = new DOMDocument();
+                            $doc->loadHTML("<span>" . $r[ $column['td'] ] ."</span>");
+                            $docEl = $doc->getElementsByTagName("span")->item(0);
+                            $nodeList = $docEl->childNodes;
+                            foreach ($nodeList as $child) {
+                                if ($child->textContent) echo ucwords(strtolower($child->textContent)) . "<br />";
+                            }
+                            //$r[ $column['td'] ] = $doc->saveHTML();
+                        } else {
+                        $r[ $column['td'] ] = ucwords(strtolower($r[ $column['td'] ]));
+                        echo $r[ $column['td'] ] ;
+                    }
                     } else {
                         echo $column['td'];
                     }
